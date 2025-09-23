@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2423994222984786082
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1329541574544508100}
+  - component: {fileID: 3442302354377341178}
+  - component: {fileID: 6558387717046144417}
+  m_Layer: 0
+  m_Name: MazeGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1329541574544508100
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2423994222984786082}
+  m_LocalRotation: {x: -0, y: 0.42378765, z: -0, w: 0.9057616}
+  m_LocalPosition: {x: 0, y: 0, z: -19.982546}
+  m_LocalScale: {x: 2.1128843, y: 8, z: 14.887119}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -2715.0408, y: -0.00624997}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &3442302354377341178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2423994222984786082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68673fd6c0c05e24b9ec73bb407a92bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mazeWidth: 5
+  mazeHeight: 5
+  cellSize: 5
+  wallPrefab: {fileID: 4059496451358780554, guid: 2376209bd5804894c823cdbc7cb2b6ac, type: 3}
+  collectiblePrefab: {fileID: 1214769950082698313, guid: a5730e1ed44bd18408ff450d30a6e122, type: 3}
+  mazeParent: {fileID: 0}
+--- !u!114 &6558387717046144417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2423994222984786082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fb9ee8f76523534b8b9ee7d506538bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startingMazeSize: 5
+  maxMazeSize: 50
+  level: 1
+  pointsPerCoin: 100
+  score: 0
+  scoreText: {fileID: 0}
+  coinsText: {fileID: 0}
+  mainMenuSceneName: MainMenu
+  gameSceneName: GameScene
+  winSceneName: WinScene
