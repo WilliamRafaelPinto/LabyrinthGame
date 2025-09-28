@@ -285,7 +285,7 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    void PlaceCollectibles(int amount)
+    public void PlaceCollectibles(int amount)
     {
         if (collectiblePrefab == null) return;
 
