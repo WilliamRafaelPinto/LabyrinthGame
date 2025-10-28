@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEditor;
+using UnityEngine.UI;
+using System.IO;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,7 +18,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Scoring")]
     public int pointsPerCoin = 100;
-    public int score = 0;
+    public int score = 50;
 
     // runtime
     private int collected = 0;
@@ -25,6 +28,8 @@ public class GameManager : MonoBehaviour
     [Header("UI (GameScene)")]
     public TextMeshProUGUI scoreText; // assign in GameScene
     public TextMeshProUGUI coinsText; // optional: show collected/required
+    public TextMeshProUGUI playerName;
+    public TMP_InputField nameInput;
 
     [Header("Scenes (names)")]
     public string mainMenuSceneName = "MainMenu";
@@ -59,6 +64,8 @@ public class GameManager : MonoBehaviour
         {
             scoreText = GameObject.Find("scoreText")?.GetComponent<TextMeshProUGUI>();
             coinsText = GameObject.Find("coinText")?.GetComponent<TextMeshProUGUI>();
+            playerName = GameObject.Find("playerName")?.GetComponent<TextMeshProUGUI>();
+            nameInput = GameObject.Find("NameInput")?.GetComponent<TMP_InputField>();
             StartLevel();
             Debug.Log("LV: " + level);
             int size = GetCurrentMazeSize();
@@ -168,6 +175,8 @@ public class GameManager : MonoBehaviour
 
         if (coinsText != null)
             coinsText.text = "Coins: " + collected + " / " + requiredToWin;
+        if (playerName != null)
+        playerName.text = PlayerPrefs.GetString("PlayerName", "Default");
     }
 
     void Win()
@@ -209,6 +218,15 @@ public class GameManager : MonoBehaviour
     public void StartNewGameFromMenu()
     {
         level = 1;
+        if (nameInput != null)
+    {
+        PlayerPrefs.SetString("PlayerName", nameInput.text);
+    }
+    else
+    {
+        Debug.LogWarning("nameInput não foi encontrado! Usando nome padrão.");
+        PlayerPrefs.SetString("PlayerName", "Player");
+    }
         SceneManager.LoadScene(gameSceneName);
     }
 
@@ -222,7 +240,8 @@ public class GameManager : MonoBehaviour
     public void ResetAll()
     {
         level = 1;
-        score = 0;
+        score = 100;
         collected = 0;
     }
+
 }
