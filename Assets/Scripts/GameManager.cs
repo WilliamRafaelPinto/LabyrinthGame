@@ -4,12 +4,14 @@ using TMPro;
 using UnityEditor;
 using UnityEngine.UI;
 using System.IO;
+//using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
     public GameObject mazeGeneratorPrefab;
+    
 
     [Header("Level / Maze settings")]
     public int startingMazeSize = 5;    // size at level 1 (square)
@@ -17,8 +19,9 @@ public class GameManager : MonoBehaviour
     public int level = 10;               // current level (1-based)
 
     [Header("Scoring")]
-    public int pointsPerCoin = 100;
-    public int score = 50;
+    public int pointsPerCoin = 10; // Modificado para 10 pontos por moeda
+    public int score = 0;
+    public float timer = 30f; // Tempo inicial em segundos
 
     // runtime
     private int collected = 0;
@@ -27,6 +30,8 @@ public class GameManager : MonoBehaviour
 
     [Header("UI (GameScene)")]
     public TextMeshProUGUI scoreText; // assign in GameScene
+
+    public TextMeshProUGUI timerText;
     public TextMeshProUGUI coinsText; // optional: show collected/required
     public TextMeshProUGUI playerName;
     public TMP_InputField nameInput;
@@ -35,6 +40,7 @@ public class GameManager : MonoBehaviour
     public string mainMenuSceneName = "MainMenu";
     public string gameSceneName = "GameScene";
     public string winSceneName = "WinScene";
+    public string gameOverSceneName = "GameOverScene"; // Adicionar cena de Game Over
 
     void Awake()
     {
@@ -63,9 +69,10 @@ public class GameManager : MonoBehaviour
         if (scene.name == gameSceneName)
         {
             scoreText = GameObject.Find("scoreText")?.GetComponent<TextMeshProUGUI>();
+            timerText = GameObject.Find("timerText")?.GetComponent<TextMeshProUGUI>();
             coinsText = GameObject.Find("coinText")?.GetComponent<TextMeshProUGUI>();
             playerName = GameObject.Find("playerName")?.GetComponent<TextMeshProUGUI>();
-            nameInput = GameObject.Find("NameInput")?.GetComponent<TMP_InputField>();
+            nameInput = GameObject.Find("nameInput")?.GetComponent<TMP_InputField>();
             StartLevel();
             Debug.Log("LV: " + level);
             int size = GetCurrentMazeSize();
@@ -84,6 +91,14 @@ public class GameManager : MonoBehaviour
             // optionally reset everything if returning to menu
         }
         else if (scene.name == winSceneName)
+        {
+            // Find the score text in the WinScene and update it
+            TextMeshProUGUI finalScoreText = GameObject.Find("FinalScoreText")?.GetComponent<TextMeshProUGUI>();
+            if (finalScoreText != null)
+            {
+                finalScoreText.text = "Final Score: " + GetFinalScoreForDisplay();
+            }
+        }else if (scene.name == gameOverSceneName)
         {
             // Find the score text in the WinScene and update it
             TextMeshProUGUI finalScoreText = GameObject.Find("FinalScoreText")?.GetComponent<TextMeshProUGUI>();
@@ -141,6 +156,7 @@ public class GameManager : MonoBehaviour
     {
         collected++;
         score += pointsPerCoin;
+        timer += pointsPerCoin;
         UpdateUI();
 
         if (collected >= requiredToWin)
@@ -160,7 +176,11 @@ public class GameManager : MonoBehaviour
             if (timeAccumulator >= 1f)
             {
                 int sub = Mathf.FloorToInt(timeAccumulator);
-                score -= sub;
+                timer -= sub;
+                if (timer <= 0)
+                {
+                    GameOver();
+                }
                 timeAccumulator -= sub;
                 UpdateUI();
             }
@@ -171,21 +191,42 @@ public class GameManager : MonoBehaviour
     void UpdateUI()
     {
         if (scoreText != null)
-            scoreText.text = "Score: " + Mathf.Max(0, score).ToString();
+            scoreText.text = "Score: " + score.ToString();
+
+        TextMeshProUGUI timerText = GameObject.Find("timerText")?.GetComponent<TextMeshProUGUI>();
+
+        if (timerText != null)
+            timerText.text = "Time: " + Mathf.Max(0, Mathf.CeilToInt(timer)).ToString();
 
         if (coinsText != null)
             coinsText.text = "Coins: " + collected + " / " + requiredToWin;
+            
         if (playerName != null)
         playerName.text = PlayerPrefs.GetString("PlayerName", "Default");
     }
 
     void Win()
     {
-        // Optionally clamp score to >=0 on final display; we leave raw score but UI shows >=0.
-        Debug.Log("You win! Score: " + score);
+        // Adiciona o tempo restante à pontuação
+        score += Mathf.Max(0, Mathf.CeilToInt(timer));
 
-        // Load win scene
+        /*// Salva a pontuação
+        string playerName = PlayerPrefs.GetString("PlayerName", "Player");
+        HighScoreData highScoreData = HighScoreData.Load();
+        highScoreData.AddScore(playerName, score, level);*/
+
+        Debug.Log("You win! Final Score: " + score);
+
+        // Carrega a cena de vitória
         SceneManager.LoadScene(winSceneName);
+    }
+
+    public void Win2()
+    {
+        // Salva a pontuação
+        string playerName = PlayerPrefs.GetString("PlayerName", "Player");
+        HighScoreData highScoreData = HighScoreData.Load();
+        highScoreData.AddScore(playerName, score, level);
     }
 
     // Called by Win menu button -> Next Level
@@ -212,11 +253,28 @@ public class GameManager : MonoBehaviour
         // level = 1;
         ResetAll();
         SceneManager.LoadScene(mainMenuSceneName);
+        //StartCoroutine(FindUIAfterLoad());
     }
+
+   /* private IEnumerator FindUIAfterLoad()
+{
+    // Esperar um frame para garantir que a cena foi carregada
+    yield return null;
+    
+    if (SceneManager.GetActiveScene().name == mainMenuSceneName)
+    {
+        nameInput = GameObject.Find("NameInput")?.GetComponent<TMP_InputField>();
+        if (nameInput != null)
+        {
+            nameInput.text = PlayerPrefs.GetString("PlayerName", "");
+        }
+    }
+}*/
 
     // Called by menu Start button (if MainMenu directly tells GM to start)
     public void StartNewGameFromMenu()
     {
+        nameInput = GameObject.Find("nameInput")?.GetComponent<TMP_InputField>();
         level = 1;
         if (nameInput != null)
     {
@@ -240,8 +298,19 @@ public class GameManager : MonoBehaviour
     public void ResetAll()
     {
         level = 1;
-        score = 100;
+        score = 0;
+        timer = 30f;
         collected = 0;
     }
 
+    void GameOver()
+    {
+        Debug.Log("Game Over!");
+        // Salva a pontuação
+        string playerName = PlayerPrefs.GetString("PlayerName", "Player");
+        HighScoreData highScoreData = HighScoreData.Load();
+        highScoreData.AddScore(playerName, score, level);
+
+        SceneManager.LoadScene(gameOverSceneName);
+    }
 }
