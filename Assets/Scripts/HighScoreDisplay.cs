@@ -22,16 +22,32 @@ public class HighScoreDisplay : MonoBehaviour
 
         HighScoreData data = HighScoreData.Load();
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine("--- RANKING ---");
-        //sb.AppendLine("Pos. | Nome | Pontuação | Nível");
+        sb.Append("<mspace=0.6em>");
+        //sb.AppendLine("--- RANKING ---");
+        //sb.AppendLine("N# | name.............. | score | Lv");
         //sb.AppendLine("---------------------------------");
 
         for (int i = 0; i < Mathf.Min(maxEntries, data.highScores.Count); i++)
-        {
-            HighScoreEntry entry = data.highScores[i];
-            sb.AppendLine($"{i + 1:00}. | {entry.playerName.PadRight(10).Substring(0, Mathf.Min(10, entry.playerName.Length))} | {entry.score:00000} | {entry.level}");
-        }
+    {
+        HighScoreEntry entry = data.highScores[i];
+        
+        // 1. Format the fixed-width number and level
+        string rank = $"{i + 1:00}";
+        string score = $"{entry.score:00000}";
+        string level = $"{entry.level:00}";
 
+        // 2. Create the flexible middle part (Name + Dots)
+        string nameField = entry.playerName.Length > 10 ? entry.playerName.Substring(0, 10) : entry.playerName;
+        int targetTotalWidth = 30; // Adjust this value until the lines look even
+        int currentLineLength = rank.Length + nameField.Length + score.Length + level.Length + 3; // +3 for the " | " separators
+        int dotsToAdd = targetTotalWidth - currentLineLength;
+
+        string dots = dotsToAdd > 0 ? new string('.', dotsToAdd) : "";
+
+        // 3. Assemble the final line
+        sb.AppendLine($"{rank} | {nameField}{dots} | {score} | {level}");
+    }
+        sb.Append("</mspace>");
         highScoreText.text = sb.ToString();
     }
 }
