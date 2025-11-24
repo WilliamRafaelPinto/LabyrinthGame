@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1329541574544508100}
   - component: {fileID: 3442302354377341178}
-  - component: {fileID: 6558387717046144417}
   m_Layer: 0
   m_Name: MazeGenerator
   m_TagString: MazeGenerator
@@ -56,37 +55,9 @@ MonoBehaviour:
   collectiblePrefab: {fileID: 1214769950082698313, guid: a5730e1ed44bd18408ff450d30a6e122, type: 3}
   slowObstaclePrefab: {fileID: 1214769950082698313, guid: d267e1b6bf5c2a74eb35d7bba80f6e98, type: 3}
   mazeParent: {fileID: 0}
+  isActiveInstance: 0
   enableDynamicWalls: 1
   wallToggleInterval: 5
   transparentWallMaterial: {fileID: 2100000, guid: 2f73219939e6db94e949cbdc6db5d6ce, type: 2}
   extraPathProbability: 0.5
   timePenaltyObstacleCount: 1
---- !u!114 &6558387717046144417
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2423994222984786082}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fb9ee8f76523534b8b9ee7d506538bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mazeGeneratorPrefab: {fileID: 0}
-  startingMazeSize: 5
-  maxMazeSize: 50
-  level: 1
-  pointsPerCoin: 100
-  score: 0
-  timer: 30
-  scoreText: {fileID: 0}
-  timerText: {fileID: 0}
-  coinsText: {fileID: 0}
-  playerName: {fileID: 0}
-  nameInput: {fileID: 0}
-  mainMenuSceneName: MainMenu
-  gameSceneName: GameScene
-  winSceneName: WinScene
-  endSceneName: WinGameScene
-  gameOverSceneName: GameOverScene

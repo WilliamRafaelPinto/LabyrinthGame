@@ -31,7 +31,7 @@ public class MazeGenerator : MonoBehaviour
 
     public GameObject wallPrefab;
     public GameObject collectiblePrefab;
-    public GameObject slowObstaclePrefab; // Novo: obstáculo que reduz velocidade
+    public GameObject slowObstaclePrefab; 
     public Transform mazeParent;
 
     [Header("Debug")]
@@ -185,7 +185,8 @@ public class MazeGenerator : MonoBehaviour
             for (int y = 1; y < mazeHeight - 1; y++)
             {
                 // Chance de remover uma parede interna para criar atalho
-                if (Random.value < extraPathProbability)
+                
+                if (Random.value < extraPathProbability/mazeHeight )
                 {
                     // Escolhe uma direção aleatória para remover a parede
                     int dir = Random.Range(0, 4);
@@ -216,7 +217,7 @@ public class MazeGenerator : MonoBehaviour
                     if (maze[x, y].walls[dir] && !IsBorderWall(x, y, dir))
                     {
                         // Chance de ser uma parede dinâmica
-                        if (Random.value <= 1.0f) // 30% de chance
+                        if (Random.value <= 0.006f * mazeHeight) // maximo 30% de chance
                         {
                             maze[x, y].isDynamicWall = true;
                             //Debug.Log("  Cell (" + x + "," + y + ") wall " + dir + " marked as dynamic.");
@@ -306,9 +307,9 @@ public class MazeGenerator : MonoBehaviour
     {
         // Alternar estado das paredes dinâmicas a cada intervalo
         //Debug.Log("Updating MazeGenerator...");
-        Debug.Log("MazeGenerator update - Instance ID: " + GetInstanceID());
+       
         if (enableDynamicWalls && dynamicWalls.Count > 0 && 
-            Time.time - lastToggleTime >= wallToggleInterval)
+            Time.time - lastToggleTime >= Random.Range(wallToggleInterval/3,wallToggleInterval))
         {
             ToggleDynamicWalls();
             lastToggleTime = Time.time;
@@ -358,7 +359,7 @@ public class MazeGenerator : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             Vector2Int pos = positions[i];
-            Vector3 worldPos = origin + new Vector3(pos.x * cellSize, 0.5f, pos.y * cellSize);
+            Vector3 worldPos = origin + new Vector3(pos.x * cellSize, 1f, pos.y * cellSize);
             Instantiate(collectiblePrefab, worldPos, Quaternion.identity, mazeParent);
         }
     }
@@ -377,7 +378,7 @@ public class MazeGenerator : MonoBehaviour
         }
 
         // Limita a quantidade ao número de células vazias
-        int count = Mathf.Min(timePenaltyObstacleCount, emptyCells.Count);
+        int count = timePenaltyObstacleCount * mazeHeight /2;
         
         // Escolhe posições aleatórias sem repetição
         List<Vector2Int> positions = new List<Vector2Int>(emptyCells);
