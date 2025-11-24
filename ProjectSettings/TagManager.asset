@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - <mspace>
+  - MazeGenerator
   layers:
   - Default
   - TransparentFX

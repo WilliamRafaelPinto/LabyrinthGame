@@ -5,7 +5,7 @@ public class PlayerPrefsExample : MonoBehaviour
     void Start()
     {
         // Salvar dados
-        PlayerPrefs.SetString("PlayerName", "Thiago");
+        PlayerPrefs.SetString("PlayerName", "Player");
         PlayerPrefs.SetInt("HighScore", 1000);
         PlayerPrefs.SetFloat("Volume", 0.8f);
         PlayerPrefs.Save(); // Força a gravação imediata

@@ -645,31 +645,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1265325869}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1614377812}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: StartNewGameFromMenu
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1614377814}
-        m_TargetAssemblyTypeName: PlayerPrefsExample, Assembly-CSharp
-        m_MethodName: SaveData
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: Test
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1265325869
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1101,12 +1077,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mazeGeneratorPrefab: {fileID: 2423994222984786082, guid: 374fc3b24f7b13c4a9abff3ec4afede7, type: 3}
-  startingMazeSize: 5
+  startingMazeSize: 10
   maxMazeSize: 50
-  level: 10
+  level: 15
   pointsPerCoin: 10
   score: 0
-  timer: 5
+  timer: 100
   scoreText: {fileID: 4943767941510087275, guid: c4501757606f8cd48994d74c237797ff, type: 3}
   timerText: {fileID: 0}
   coinsText: {fileID: 7103743805465472517, guid: 1f4e18ff01324744999a7bd5e994f412, type: 3}
@@ -1115,6 +1091,7 @@ MonoBehaviour:
   mainMenuSceneName: MainMenu
   gameSceneName: GameScene
   winSceneName: WinScene
+  endSceneName: WinGameScene
   gameOverSceneName: GameOverScene
 --- !u!4 &1614377813
 Transform:

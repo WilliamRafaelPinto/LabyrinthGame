@@ -1,160 +1,53 @@
-// using System.Collections.Generic;
-// using UnityEngine;
-
-// public class MazeGenerator : MonoBehaviour
-// {
-//     public int mazeWidth = 50;
-//     public int mazeHeight = 50;
-//     public float cellSize = 20f;
-
-//     public GameObject wallPrefab;
-//     public GameObject collectiblePrefab; // New
-//     public Transform mazeParent;
-
-//     private Vector2Int[] directions = {
-//         new Vector2Int(0, 1),   // up
-//         new Vector2Int(1, 0),   // right
-//         new Vector2Int(0, -1),  // down
-//         new Vector2Int(-1, 0)   // left
-//     };
-
-//     private struct Cell
-//     {
-//         public bool visited;
-//         public bool[] walls; // top, right, bottom, left
-
-//         public Cell(bool v)
-//         {
-//             visited = v;
-//             walls = new bool[] { true, true, true, true };
-//         }
-//     }
-
-//     private Cell[,] maze;
-//     private List<Vector2Int> emptyCells = new List<Vector2Int>();
-
-//     void Start()
-//     {
-//         GenerateMaze();
-//         DrawMaze();
-//         PlaceCollectibles(3); // Place 3 collectibles
-//     }
-
-//     void GenerateMaze()
-//     {
-//         maze = new Cell[mazeWidth, mazeHeight];
-
-//         for (int x = 0; x < mazeWidth; x++)
-//             for (int y = 0; y < mazeHeight; y++)
-//                 maze[x, y] = new Cell(false);
-
-//         RecursiveBacktrack(new Vector2Int(0, 0));
-//     }
-
-//     void RecursiveBacktrack(Vector2Int pos)
-//     {
-//         maze[pos.x, pos.y].visited = true;
-
-//         List<int> dirs = new List<int> { 0, 1, 2, 3 };
-//         Shuffle(dirs);
-
-//         foreach (int i in dirs)
-//         {
-//             Vector2Int next = pos + directions[i];
-
-//             if (IsInBounds(next) && !maze[next.x, next.y].visited)
-//             {
-//                 maze[pos.x, pos.y].walls[i] = false;
-//                 maze[next.x, next.y].walls[(i + 2) % 4] = false;
-
-//                 RecursiveBacktrack(next);
-//             }
-//         }
-//     }
-
-//     void DrawMaze()
-//     {
-//         Vector3 origin = new Vector3(-mazeWidth * cellSize / 2, 0, -mazeHeight * cellSize / 2);
-
-//         for (int x = 0; x < mazeWidth; x++)
-//         {
-//             for (int y = 0; y < mazeHeight; y++)
-//             {
-//                 Vector3 cellPos = origin + new Vector3(x * cellSize, 0, y * cellSize);
-//                 emptyCells.Add(new Vector2Int(x, y)); // Store cell for collectible placement
-
-//                 if (maze[x, y].walls[0]) // top
-//                     Instantiate(wallPrefab, cellPos + new Vector3(0, 0, cellSize / 2), Quaternion.identity, mazeParent).transform.localScale = new Vector3(cellSize, 10, 1);
-
-//                 if (maze[x, y].walls[1]) // right
-//                     Instantiate(wallPrefab, cellPos + new Vector3(cellSize / 2, 0, 0), Quaternion.Euler(0, 90, 0), mazeParent).transform.localScale = new Vector3(cellSize, 10, 1);
-
-//                 if (y == 0 && maze[x, y].walls[2]) // bottom
-//                     Instantiate(wallPrefab, cellPos + new Vector3(0, 0, -cellSize / 2), Quaternion.identity, mazeParent).transform.localScale = new Vector3(cellSize, 10, 1);
-
-//                 if (x == 0 && maze[x, y].walls[3]) // left
-//                     Instantiate(wallPrefab, cellPos + new Vector3(-cellSize / 2, 0, 0), Quaternion.Euler(0, 90, 0), mazeParent).transform.localScale = new Vector3(cellSize, 10, 1);
-//             }
-//         }
-//     }
-
-//     void PlaceCollectibles(int amount)
-//     {
-//         Vector3 origin = new Vector3(-mazeWidth * cellSize / 2, 0, -mazeHeight * cellSize / 2);
-//         List<Vector2Int> cells = new List<Vector2Int>(emptyCells);
-//         Shuffle(cells);
-
-//         int placed = 0;
-//         foreach (Vector2Int cell in cells)
-//         {
-//             if (cell == Vector2Int.zero) continue; // Avoid start position
-
-//             Vector3 spawnPos = origin + new Vector3(cell.x * cellSize, 1, cell.y * cellSize);
-//             Instantiate(collectiblePrefab, spawnPos, Quaternion.identity);
-
-//             placed++;
-//             if (placed >= amount)
-//                 break;
-//         }
-//     }
-
-//     bool IsInBounds(Vector2Int pos)
-//     {
-//         return pos.x >= 0 && pos.x < mazeWidth && pos.y >= 0 && pos.y < mazeHeight;
-//     }
-
-//     void Shuffle(List<int> list)
-//     {
-//         for (int i = 0; i < list.Count; i++)
-//         {
-//             int rnd = Random.Range(i, list.Count);
-//             (list[i], list[rnd]) = (list[rnd], list[i]);
-//         }
-//     }
-
-//     void Shuffle<T>(List<T> list)
-//     {
-//         for (int i = 0; i < list.Count; i++)
-//         {
-//             int rnd = Random.Range(i, list.Count);
-//             (list[i], list[rnd]) = (list[rnd], list[i]);
-//         }
-//     }
-// }
-
+// gerar labirinto usando algoritmo de backtracking recursivo com funcionalidades dinâmicas
 using System.Collections.Generic;
 using UnityEngine;
 
 public class MazeGenerator : MonoBehaviour
 {
-    // If you want to preview in inspector, set defaults here.
+    // 1. Mudar a propriedade Instance para ser privada e usar um método estático para acesso
+    private static MazeGenerator _instance;
+    public static MazeGenerator Instance
+    {
+        get
+        {
+            // Se a instância for nula, tenta encontrá-la na cena
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<MazeGenerator>();
+
+                // Se ainda for nula, algo está errado ou ainda não foi instanciada
+                if (_instance == null)
+                {
+                    Debug.LogError("MazeGenerator: Nenhuma instância encontrada na cena.");
+                }
+            }
+            return _instance;
+        }
+    }
+
     public int mazeWidth = 10;
     public int mazeHeight = 10;
     public float cellSize = 2f;
 
     public GameObject wallPrefab;
     public GameObject collectiblePrefab;
+    public GameObject slowObstaclePrefab; // Novo: obstáculo que reduz velocidade
     public Transform mazeParent;
+
+    [Header("Debug")]
+    public bool isActiveInstance = false;
+
+    [Header("Dynamic Walls Settings")]
+    public bool enableDynamicWalls = true;
+    public float wallToggleInterval = 5f; // Alternar a cada 5 segundos
+    public Material transparentWallMaterial; // Material para paredes transparentes
+    
+    [Header("Multiple Paths Settings")]
+    [Range(0f, 1f)]
+    public float extraPathProbability = 0.5f; // Probabilidade de criar caminhos extras
+
+    [Header("Obstacles Settings")]
+    public int timePenaltyObstacleCount = 2;
 
     private Vector2Int[] directions = {
         new Vector2Int(0, 1),   // up
@@ -167,57 +60,100 @@ public class MazeGenerator : MonoBehaviour
     {
         public bool visited;
         public bool[] walls; // top, right, bottom, left
+        public bool isDynamicWall; // Se esta célula tem paredes dinâmicas
 
         public Cell(bool v)
         {
             visited = v;
             walls = new bool[] { true, true, true, true };
+            isDynamicWall = false;
         }
     }
 
     private Cell[,] maze;
     private List<Vector2Int> emptyCells = new List<Vector2Int>();
-
-    // void Start()
-    // {
-    //     // If GameManager specifies a maze size, use it
-    //     if (GameManager.Instance != null)
-    //     {
-    //         int gmSize = GameManager.Instance.GetCurrentMazeSize();
-    //         mazeWidth = gmSize;
-    //         mazeHeight = gmSize;
-    //     }
-
-    //     GenerateMaze();
-    //     DrawMaze();
-
-    //     // ask GameManager how many coins should be placed (fallback to 3)
-    //     int coinAmount = 3;
-    //     if (GameManager.Instance != null)
-    //         coinAmount = GameManager.Instance.GetCoinCount();
-
-    //     PlaceCollectibles(coinAmount);
-    // }
-
+    private List<GameObject> dynamicWalls = new List<GameObject>(); // Lista de paredes dinâmicas
+    private float lastToggleTime = 0f;
+    private bool wallsActive = true;
+    
+    void Awake()
+    {
+        //Debug.Log($"🔧 MazeGenerator Awake - Instance ID: {GetInstanceID()}");
+        /*
+        // 2. Lógica de Singleton modificada:
+        // Se a instância for nula, esta é a primeira.
+        if (_instance == null)
+        {
+            _instance = this;
+            isActiveInstance = true;
+            // O MazeGenerator NÃO deve usar DontDestroyOnLoad, pois ele é específico da cena.
+            Debug.Log($"✅ MazeGenerator instância principal definida: {GetInstanceID()}");
+        }
+        // Se a instância já existe e não é esta, destrua-se.
+        // Isso é para o caso de o prefab ser instanciado diretamente na cena.
+        else if (_instance != this)
+        {
+            //Debug.Log($"🗑️ Destruindo MazeGenerator duplicado: {GetInstanceID()}");
+            Destroy(gameObject);
+        }*/
+        // Se _instance == this, significa que o objeto já foi definido como a instância.
+    }
+    
+    void OnDestroy()
+    {
+        // Se esta é a instância ativa, limpe a referência
+        if (_instance == this)
+        {
+            //Debug.Log($"🧹 Limpando referência MazeGenerator: {GetInstanceID()}");
+            _instance = null;
+        }
+    }
+    
     public void Generate(int width, int height)
-{
-    mazeWidth = width;
-    mazeHeight = height;
+    {
+        // Destruir o labirinto anterior antes de gerar um novo
+        Debug.Log($"🔧 MazeGenerator Generate pt 1 - Instance ID: {GetInstanceID()}");
+        if (mazeParent != null)
+        {
+            foreach (Transform child in mazeParent)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+        Debug.Log($"🔧 MazeGenerator Generate pt 2 - Instance ID: {GetInstanceID()}");
+        mazeWidth = width;
+        mazeHeight = height;
 
-    emptyCells.Clear();
-    GenerateMaze();
-    DrawMaze();
-}
+        emptyCells.Clear();
+        dynamicWalls.Clear();
+        GenerateMaze();
+        Debug.Log($"🔧 MazeGenerator Generate pt 3 - Instance ID: {GetInstanceID()}");
+        DrawMaze();
+        Debug.Log($"🔧 MazeGenerator Generate pt 4 - Instance ID: {GetInstanceID()}");
+        
+        // Inicia a corrotina para alternar paredes se estiver habilitado
+        if (enableDynamicWalls)
+        {
+            lastToggleTime = Time.time;
+        }
+    }
 
     void GenerateMaze()
     {
         maze = new Cell[mazeWidth, mazeHeight];
-
+        
         for (int x = 0; x < mazeWidth; x++)
             for (int y = 0; y < mazeHeight; y++)
                 maze[x, y] = new Cell(false);
 
         RecursiveBacktrack(new Vector2Int(0, 0));
+        
+        // Adicionar caminhos extras para mais dinâmica
+        AddExtraPaths();
+        
+        // Marcar algumas paredes internas como dinâmicas
+        MarkDynamicWalls();
+        
     }
 
     void RecursiveBacktrack(Vector2Int pos)
@@ -241,46 +177,160 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
+    // Adiciona caminhos extras para criar múltiplas rotas
+    void AddExtraPaths()
+    {
+        for (int x = 1; x < mazeWidth - 1; x++)
+        {
+            for (int y = 1; y < mazeHeight - 1; y++)
+            {
+                // Chance de remover uma parede interna para criar atalho
+                if (Random.value < extraPathProbability)
+                {
+                    // Escolhe uma direção aleatória para remover a parede
+                    int dir = Random.Range(0, 4);
+                    Vector2Int next = new Vector2Int(x, y) + directions[dir];
+                    
+                    if (IsInBounds(next) && !IsBorderWall(x, y, dir))
+                    {
+                        maze[x, y].walls[dir] = false;
+                        maze[next.x, next.y].walls[(dir + 2) % 4] = false;
+                    }
+                }
+            }
+        }
+    }
+
+    // Marca paredes internas como dinâmicas (não inclui bordas)
+    void MarkDynamicWalls()
+    {
+        //Debug.Log("Marking dynamic walls...");
+        for (int x = 0; x < mazeWidth; x++)
+        {
+            //Debug.Log("Processing row " + x);
+            for (int y = 0; y < mazeHeight; y++)
+            {
+                //Debug.Log(" Processing cell " + y);
+                for (int dir = 0; dir < 4; dir++)
+                {
+                    if (maze[x, y].walls[dir] && !IsBorderWall(x, y, dir))
+                    {
+                        // Chance de ser uma parede dinâmica
+                        if (Random.value <= 1.0f) // 30% de chance
+                        {
+                            maze[x, y].isDynamicWall = true;
+                            //Debug.Log("  Cell (" + x + "," + y + ") wall " + dir + " marked as dynamic.");
+                        }else
+                        {
+                            //Debug.Log("  Cell (" + x + "," + y + ") wall " + dir + " is static.");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Verifica se é uma parede da borda
+    bool IsBorderWall(int x, int y, int direction)
+    {
+        return (x == 0 && direction == 3) || // Parede esquerda da borda
+               (x == mazeWidth - 1 && direction == 1) || // Parede direita da borda
+               (y == 0 && direction == 2) || // Parede inferior da borda
+               (y == mazeHeight - 1 && direction == 0); // Parede superior da borda
+    }
+
     void DrawMaze()
     {
         emptyCells.Clear();
+        //dynamicWalls.Clear();
 
         Vector3 origin = new Vector3(-mazeWidth * cellSize / 2f, 0, -mazeHeight * cellSize / 2f);
-
+        int dynamicWallCount = 0;
         for (int x = 0; x < mazeWidth; x++)
         {
             for (int y = 0; y < mazeHeight; y++)
             {
                 Vector3 cellPos = origin + new Vector3(x * cellSize, 0, y * cellSize);
-                emptyCells.Add(new Vector2Int(x, y)); // store for collectible placement
+                emptyCells.Add(new Vector2Int(x, y));
 
                 // top (z +)
                 if (maze[x, y].walls[0])
                 {
-                    var w = Instantiate(wallPrefab, cellPos + new Vector3(0, 0, cellSize / 2f), Quaternion.identity, mazeParent);
-                    w.transform.localScale = new Vector3(cellSize, w.transform.localScale.y, 1f);
+                    CreateWall(cellPos + new Vector3(0, 0, cellSize / 2f), Quaternion.identity, x, y, 0);
+                    dynamicWallCount++;
                 }
 
                 // right (x +)
                 if (maze[x, y].walls[1])
                 {
-                    var w = Instantiate(wallPrefab, cellPos + new Vector3(cellSize / 2f, 0, 0), Quaternion.Euler(0, 90, 0), mazeParent);
-                    w.transform.localScale = new Vector3(cellSize, w.transform.localScale.y, 1f);
+                    CreateWall(cellPos + new Vector3(cellSize / 2f, 0, 0), Quaternion.Euler(0, 90, 0), x, y, 1);
+                    dynamicWallCount++;
                 }
 
                 // bottom (only draw on y==0 to avoid duplicates)
                 if (y == 0 && maze[x, y].walls[2])
                 {
-                    var w = Instantiate(wallPrefab, cellPos + new Vector3(0, 0, -cellSize / 2f), Quaternion.identity, mazeParent);
-                    w.transform.localScale = new Vector3(cellSize, w.transform.localScale.y, 1f);
+                    CreateWall(cellPos + new Vector3(0, 0, -cellSize / 2f), Quaternion.identity, x, y, 2);
+                    dynamicWallCount++;
                 }
 
                 // left (only draw on x==0 to avoid duplicates)
                 if (x == 0 && maze[x, y].walls[3])
                 {
-                    var w = Instantiate(wallPrefab, cellPos + new Vector3(-cellSize / 2f, 0, 0), Quaternion.Euler(0, 90, 0), mazeParent);
-                    w.transform.localScale = new Vector3(cellSize, w.transform.localScale.y, 1f);
+                    CreateWall(cellPos + new Vector3(-cellSize / 2f, 0, 0), Quaternion.Euler(0, 90, 0), x, y, 3);
+                    dynamicWallCount++;
                 }
+            }
+        }
+        Debug.Log("DrawMaze finished. Total dynamic walls: " + dynamicWallCount);
+        Debug.Log("dynamicWalls list count: " + dynamicWalls.Count);
+    }
+
+    void CreateWall(Vector3 position, Quaternion rotation, int x, int y, int direction)
+    {
+        var wall = Instantiate(wallPrefab, position, rotation, mazeParent);
+        wall.transform.localScale = new Vector3(cellSize, wall.transform.localScale.y, 1f);
+        
+        // Se for uma parede dinâmica e não for da borda, adiciona à lista
+        if (maze[x, y].isDynamicWall && !IsBorderWall(x, y, direction) && enableDynamicWalls)
+        {
+            dynamicWalls.Add(wall);
+            //Debug.Log("Added dynamic wall at cell (" + x + "," + y + ") direction " + direction);
+            // Adiciona componente para controlar o estado da parede
+            var wallController = wall.AddComponent<DynamicWallController>();
+            wallController.SetTransparentMaterial(transparentWallMaterial);
+        }
+    }
+
+    void Update()
+    {
+        // Alternar estado das paredes dinâmicas a cada intervalo
+        //Debug.Log("Updating MazeGenerator...");
+        Debug.Log("MazeGenerator update - Instance ID: " + GetInstanceID());
+        if (enableDynamicWalls && dynamicWalls.Count > 0 && 
+            Time.time - lastToggleTime >= wallToggleInterval)
+        {
+            ToggleDynamicWalls();
+            lastToggleTime = Time.time;
+        }else
+        {
+            Debug.Log("Not time to toggle walls yet."+enableDynamicWalls+" "+dynamicWalls.Count+" "+(Time.time - lastToggleTime)+" "+wallToggleInterval);
+        }
+    }
+
+    void ToggleDynamicWalls()
+    {
+        wallsActive = !wallsActive;
+        Debug.Log("Toggling dynamic walls. Now active: " + wallsActive);
+        foreach (var wall in dynamicWalls)
+        {
+            var controller = wall.GetComponent<DynamicWallController>();
+            if (controller != null)
+            {
+                controller.ToggleWall(wallsActive);
+            }else
+            {
+                Debug.LogWarning("Dynamic wall missing controller component.");
             }
         }
     }
@@ -290,20 +340,54 @@ public class MazeGenerator : MonoBehaviour
         if (collectiblePrefab == null) return;
 
         Vector3 origin = new Vector3(-mazeWidth * cellSize / 2f, 0, -mazeHeight * cellSize / 2f);
-        List<Vector2Int> cells = new List<Vector2Int>(emptyCells);
-        Shuffle(cells);
-
-        int placed = 0;
-        foreach (Vector2Int cell in cells)
+        
+        // Garante que a lista de células vazias não esteja vazia
+        if (emptyCells.Count == 0)
         {
-            if (cell == Vector2Int.zero) continue; // avoid start cell
+            Debug.LogWarning("Não há células vazias para colocar colecionáveis.");
+            return;
+        }
 
-            Vector3 spawnPos = origin + new Vector3(cell.x * cellSize, 1f, cell.y * cellSize);
-            Instantiate(collectiblePrefab, spawnPos, Quaternion.identity, mazeParent);
+        // Limita a quantidade ao número de células vazias
+        int count = Mathf.Min(amount, emptyCells.Count);
+        
+        // Escolhe posições aleatórias sem repetição
+        List<Vector2Int> positions = new List<Vector2Int>(emptyCells);
+        Shuffle(positions);
 
-            placed++;
-            if (placed >= amount)
-                break;
+        for (int i = 0; i < count; i++)
+        {
+            Vector2Int pos = positions[i];
+            Vector3 worldPos = origin + new Vector3(pos.x * cellSize, 0.5f, pos.y * cellSize);
+            Instantiate(collectiblePrefab, worldPos, Quaternion.identity, mazeParent);
+        }
+    }
+
+    public void PlaceObstacles()
+    {
+        if (slowObstaclePrefab == null) return;
+
+        Vector3 origin = new Vector3(-mazeWidth * cellSize / 2f, 0, -mazeHeight * cellSize / 2f);
+        
+        // Garante que a lista de células vazias não esteja vazia
+        if (emptyCells.Count == 0)
+        {
+            Debug.LogWarning("Não há células vazias para colocar obstáculos.");
+            return;
+        }
+
+        // Limita a quantidade ao número de células vazias
+        int count = Mathf.Min(timePenaltyObstacleCount, emptyCells.Count);
+        
+        // Escolhe posições aleatórias sem repetição
+        List<Vector2Int> positions = new List<Vector2Int>(emptyCells);
+        Shuffle(positions);
+
+        for (int i = 0; i < count; i++)
+        {
+            Vector2Int pos = positions[i];
+            Vector3 worldPos = origin + new Vector3(pos.x * cellSize, 0.5f, pos.y * cellSize);
+            Instantiate(slowObstaclePrefab, worldPos, Quaternion.identity, mazeParent);
         }
     }
 
@@ -312,21 +396,52 @@ public class MazeGenerator : MonoBehaviour
         return pos.x >= 0 && pos.x < mazeWidth && pos.y >= 0 && pos.y < mazeHeight;
     }
 
-    void Shuffle(List<int> list)
+    void Shuffle<T>(List<T> list)
     {
-        for (int i = 0; i < list.Count; i++)
+        for (int i = list.Count - 1; i > 0; i--)
         {
-            int rnd = Random.Range(i, list.Count);
-            (list[i], list[rnd]) = (list[rnd], list[i]);
+            int j = Random.Range(0, i + 1);
+            T temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
+        }
+    }
+}
+
+// Classe auxiliar para controlar o estado da parede dinâmica (necessária para o Labirinto.cs)
+public class DynamicWallController : MonoBehaviour
+{
+    private Material originalMaterial;
+    private Material transparentMaterial;
+    private Renderer wallRenderer;
+    private Collider wallCollider;
+
+    public void SetTransparentMaterial(Material material)
+    {
+        transparentMaterial = material;
+        wallRenderer = GetComponent<Renderer>();
+        wallCollider = GetComponent<Collider>();
+        if (wallRenderer != null)
+        {
+            originalMaterial = wallRenderer.material;
         }
     }
 
-    void Shuffle<T>(List<T> list)
+    public void ToggleWall(bool active)
     {
-        for (int i = 0; i < list.Count; i++)
+        if (wallRenderer == null || wallCollider == null) return;
+
+        if (active)
         {
-            int rnd = Random.Range(i, list.Count);
-            (list[i], list[rnd]) = (list[rnd], list[i]);
+            // Parede ativa: visível e com colisão
+            wallRenderer.material = originalMaterial;
+            wallCollider.enabled = true;
+        }
+        else
+        {
+            // Parede inativa: transparente e sem colisão (passável)
+            wallRenderer.material = transparentMaterial;
+            wallCollider.enabled = false;
         }
     }
 }
