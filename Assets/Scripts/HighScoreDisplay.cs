@@ -16,7 +16,7 @@ public class HighScoreDisplay : MonoBehaviour
     {
         if (highScoreText == null)
         {
-            Debug.LogError("TextMeshProUGUI para HighScore não atribuído.");
+            //Debug.LogError("TextMeshProUGUI para HighScore não atribuído.");
             return;
         }
 

@@ -24,7 +24,7 @@ public class HighScoreData
             }
             catch (Exception e)
             {
-                Debug.LogError("Erro ao carregar HighScores: " + e.Message);
+                //Debug.LogError("Erro ao carregar HighScores: " + e.Message);
                 return new HighScoreData();
             }
         }
@@ -40,11 +40,11 @@ public class HighScoreData
             highScores.Sort();
             string json = JsonUtility.ToJson(this, true);
             File.WriteAllText(filePath, json);
-            Debug.Log("HighScores salvos em: " + filePath);
+            //Debug.Log("HighScores salvos em: " + filePath);
         }
         catch (Exception e)
         {
-            Debug.LogError("Erro ao salvar HighScores: " + e.Message);
+            //Debug.LogError("Erro ao salvar HighScores: " + e.Message);
         }
     }
 

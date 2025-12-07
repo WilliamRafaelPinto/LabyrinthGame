@@ -18,7 +18,7 @@ public class MazeGenerator : MonoBehaviour
                 // Se ainda for nula, algo está errado ou ainda não foi instanciada
                 if (_instance == null)
                 {
-                    Debug.LogError("MazeGenerator: Nenhuma instância encontrada na cena.");
+                    ////Debug.LogError("MazeGenerator: Nenhuma instância encontrada na cena.");
                 }
             }
             return _instance;
@@ -78,7 +78,7 @@ public class MazeGenerator : MonoBehaviour
     
     void Awake()
     {
-        //Debug.Log($"🔧 MazeGenerator Awake - Instance ID: {GetInstanceID()}");
+        ////Debug.Log($"🔧 MazeGenerator Awake - Instance ID: {GetInstanceID()}");
         /*
         // 2. Lógica de Singleton modificada:
         // Se a instância for nula, esta é a primeira.
@@ -87,13 +87,13 @@ public class MazeGenerator : MonoBehaviour
             _instance = this;
             isActiveInstance = true;
             // O MazeGenerator NÃO deve usar DontDestroyOnLoad, pois ele é específico da cena.
-            Debug.Log($"✅ MazeGenerator instância principal definida: {GetInstanceID()}");
+            //Debug.Log($"✅ MazeGenerator instância principal definida: {GetInstanceID()}");
         }
         // Se a instância já existe e não é esta, destrua-se.
         // Isso é para o caso de o prefab ser instanciado diretamente na cena.
         else if (_instance != this)
         {
-            //Debug.Log($"🗑️ Destruindo MazeGenerator duplicado: {GetInstanceID()}");
+            ////Debug.Log($"🗑️ Destruindo MazeGenerator duplicado: {GetInstanceID()}");
             Destroy(gameObject);
         }*/
         // Se _instance == this, significa que o objeto já foi definido como a instância.
@@ -104,7 +104,7 @@ public class MazeGenerator : MonoBehaviour
         // Se esta é a instância ativa, limpe a referência
         if (_instance == this)
         {
-            //Debug.Log($"🧹 Limpando referência MazeGenerator: {GetInstanceID()}");
+            ////Debug.Log($"🧹 Limpando referência MazeGenerator: {GetInstanceID()}");
             _instance = null;
         }
     }
@@ -112,7 +112,7 @@ public class MazeGenerator : MonoBehaviour
     public void Generate(int width, int height)
     {
         // Destruir o labirinto anterior antes de gerar um novo
-        Debug.Log($"🔧 MazeGenerator Generate pt 1 - Instance ID: {GetInstanceID()}");
+        //Debug.Log($"🔧 MazeGenerator Generate pt 1 - Instance ID: {GetInstanceID()}");
         if (mazeParent != null)
         {
             foreach (Transform child in mazeParent)
@@ -120,16 +120,16 @@ public class MazeGenerator : MonoBehaviour
                 Destroy(child.gameObject);
             }
         }
-        Debug.Log($"🔧 MazeGenerator Generate pt 2 - Instance ID: {GetInstanceID()}");
+        ////Debug.Log($"🔧 MazeGenerator Generate pt 2 - Instance ID: {GetInstanceID()}");
         mazeWidth = width;
         mazeHeight = height;
 
         emptyCells.Clear();
         dynamicWalls.Clear();
         GenerateMaze();
-        Debug.Log($"🔧 MazeGenerator Generate pt 3 - Instance ID: {GetInstanceID()}");
+        ////Debug.Log($"🔧 MazeGenerator Generate pt 3 - Instance ID: {GetInstanceID()}");
         DrawMaze();
-        Debug.Log($"🔧 MazeGenerator Generate pt 4 - Instance ID: {GetInstanceID()}");
+        ////Debug.Log($"🔧 MazeGenerator Generate pt 4 - Instance ID: {GetInstanceID()}");
         
         // Inicia a corrotina para alternar paredes se estiver habilitado
         if (enableDynamicWalls)
@@ -205,13 +205,13 @@ public class MazeGenerator : MonoBehaviour
     // Marca paredes internas como dinâmicas (não inclui bordas)
     void MarkDynamicWalls()
     {
-        //Debug.Log("Marking dynamic walls...");
+        ////Debug.Log("Marking dynamic walls...");
         for (int x = 0; x < mazeWidth; x++)
         {
-            //Debug.Log("Processing row " + x);
+            ////Debug.Log("Processing row " + x);
             for (int y = 0; y < mazeHeight; y++)
             {
-                //Debug.Log(" Processing cell " + y);
+                ////Debug.Log(" Processing cell " + y);
                 for (int dir = 0; dir < 4; dir++)
                 {
                     if (maze[x, y].walls[dir] && !IsBorderWall(x, y, dir))
@@ -220,10 +220,10 @@ public class MazeGenerator : MonoBehaviour
                         if (Random.value <= 0.006f * mazeHeight) // maximo 30% de chance
                         {
                             maze[x, y].isDynamicWall = true;
-                            //Debug.Log("  Cell (" + x + "," + y + ") wall " + dir + " marked as dynamic.");
+                            ////Debug.Log("  Cell (" + x + "," + y + ") wall " + dir + " marked as dynamic.");
                         }else
                         {
-                            //Debug.Log("  Cell (" + x + "," + y + ") wall " + dir + " is static.");
+                            ////Debug.Log("  Cell (" + x + "," + y + ") wall " + dir + " is static.");
                         }
                     }
                 }
@@ -283,8 +283,8 @@ public class MazeGenerator : MonoBehaviour
                 }
             }
         }
-        Debug.Log("DrawMaze finished. Total dynamic walls: " + dynamicWallCount);
-        Debug.Log("dynamicWalls list count: " + dynamicWalls.Count);
+        ////Debug.Log("DrawMaze finished. Total dynamic walls: " + dynamicWallCount);
+        ////Debug.Log("dynamicWalls list count: " + dynamicWalls.Count);
     }
 
     void CreateWall(Vector3 position, Quaternion rotation, int x, int y, int direction)
@@ -296,7 +296,7 @@ public class MazeGenerator : MonoBehaviour
         if (maze[x, y].isDynamicWall && !IsBorderWall(x, y, direction) && enableDynamicWalls)
         {
             dynamicWalls.Add(wall);
-            //Debug.Log("Added dynamic wall at cell (" + x + "," + y + ") direction " + direction);
+            ////Debug.Log("Added dynamic wall at cell (" + x + "," + y + ") direction " + direction);
             // Adiciona componente para controlar o estado da parede
             var wallController = wall.AddComponent<DynamicWallController>();
             wallController.SetTransparentMaterial(transparentWallMaterial);
@@ -306,7 +306,7 @@ public class MazeGenerator : MonoBehaviour
     void Update()
     {
         // Alternar estado das paredes dinâmicas a cada intervalo
-        //Debug.Log("Updating MazeGenerator...");
+        ////Debug.Log("Updating MazeGenerator...");
        
         if (enableDynamicWalls && dynamicWalls.Count > 0 && 
             Time.time - lastToggleTime >= Random.Range(wallToggleInterval/3,wallToggleInterval))
@@ -315,14 +315,14 @@ public class MazeGenerator : MonoBehaviour
             lastToggleTime = Time.time;
         }else
         {
-            Debug.Log("Not time to toggle walls yet."+enableDynamicWalls+" "+dynamicWalls.Count+" "+(Time.time - lastToggleTime)+" "+wallToggleInterval);
+            ////Debug.Log("Not time to toggle walls yet."+enableDynamicWalls+" "+dynamicWalls.Count+" "+(Time.time - lastToggleTime)+" "+wallToggleInterval);
         }
     }
 
     void ToggleDynamicWalls()
     {
         wallsActive = !wallsActive;
-        Debug.Log("Toggling dynamic walls. Now active: " + wallsActive);
+        ////Debug.Log("Toggling dynamic walls. Now active: " + wallsActive);
         foreach (var wall in dynamicWalls)
         {
             var controller = wall.GetComponent<DynamicWallController>();
@@ -331,7 +331,7 @@ public class MazeGenerator : MonoBehaviour
                 controller.ToggleWall(wallsActive);
             }else
             {
-                Debug.LogWarning("Dynamic wall missing controller component.");
+                ////Debug.LogWarning("Dynamic wall missing controller component.");
             }
         }
     }
@@ -345,7 +345,7 @@ public class MazeGenerator : MonoBehaviour
         // Garante que a lista de células vazias não esteja vazia
         if (emptyCells.Count == 0)
         {
-            Debug.LogWarning("Não há células vazias para colocar colecionáveis.");
+            ////Debug.LogWarning("Não há células vazias para colocar colecionáveis.");
             return;
         }
 
@@ -373,7 +373,7 @@ public class MazeGenerator : MonoBehaviour
         // Garante que a lista de células vazias não esteja vazia
         if (emptyCells.Count == 0)
         {
-            Debug.LogWarning("Não há células vazias para colocar obstáculos.");
+            ////Debug.LogWarning("Não há células vazias para colocar obstáculos.");
             return;
         }
 

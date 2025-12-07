@@ -30,7 +30,7 @@ public class JsonSaveSystem : MonoBehaviour
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(filePath, json);
         
-        Debug.Log("Jogo salvo em: " + filePath);
+        //Debug.Log("Jogo salvo em: " + filePath);
     }
     
     public void LoadGame()
@@ -40,11 +40,11 @@ public class JsonSaveSystem : MonoBehaviour
             string json = File.ReadAllText(filePath);
             PlayerData data = JsonUtility.FromJson<PlayerData>(json);
             
-            Debug.Log($"Dados carregados - Nome: {data.playerName}, Nível: {data.level}");
+            //Debug.Log($"Dados carregados - Nome: {data.playerName}, Nível: {data.level}");
         }
         else
         {
-            Debug.LogWarning("Arquivo de save não encontrado!");
+            //Debug.LogWarning("Arquivo de save não encontrado!");
         }
     }
 }

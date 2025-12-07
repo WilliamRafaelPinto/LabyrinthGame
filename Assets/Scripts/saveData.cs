@@ -15,7 +15,7 @@ public class PlayerPrefsExample : MonoBehaviour
         int highScore = PlayerPrefs.GetInt("HighScore", 0);
         float volume = PlayerPrefs.GetFloat("Volume", 1.0f);
         
-        Debug.Log($"Nome: {playerName}, Pontuação: {highScore}, Volume: {volume}");
+        //Debug.Log($"Nome: {playerName}, Pontuação: {highScore}, Volume: {volume}");
     }
     
     void OnApplicationQuit()

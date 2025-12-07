@@ -11,7 +11,7 @@ public class MenuUI : MonoBehaviour
 
     public void QuitGame()
     {
-        Debug.Log("Quit pressed!");
+        //Debug.Log("Quit pressed!");
         Application.Quit(); // Works in build, not in editor
     }
 }

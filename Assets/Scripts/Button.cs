@@ -22,7 +22,7 @@ public class WinMenuUI : MonoBehaviour
 
     void QuitGame()
     {
-        Debug.Log("Quitting game...");
+        //Debug.Log("Quitting game...");
         Application.Quit();
 
         // In editor, stop play mode too

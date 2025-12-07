@@ -12,6 +12,10 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public GameObject mazeGeneratorPrefab;
+
+    public AudioClip collecFragtSound;
+
+    public AudioClip obstacleSound;
     
     // Referência à instância do MazeGenerator que está ativa na cena
     private MazeGenerator currentMazeGenerator;
@@ -89,20 +93,20 @@ public class GameManager : MonoBehaviour
             // 2. Se não encontrar, instancia a partir do prefab
             if (currentMazeGenerator == null)
             {
-                Debug.Log("Instanciando novo MazeGenerator.");
+                //Debug.Log("Instanciando novo MazeGenerator.");
                 GameObject mazeObj = Instantiate(mazeGeneratorPrefab);
                 currentMazeGenerator = mazeObj.GetComponent<MazeGenerator>();
             }
             else
             {
-                Debug.Log("Reutilizando MazeGenerator existente.");
+                //Debug.Log("Reutilizando MazeGenerator existente.");
             }
 
             // 3. Verifica se a referência é válida antes de chamar Generate
             if (currentMazeGenerator != null)
             {
                 StartLevel();
-                Debug.Log("LV: " + level);
+                //Debug.Log("LV: " + level);
                 int size = GetCurrentMazeSize();
                 
                 // Chama Generate na instância (existente ou nova)
@@ -112,7 +116,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("MazeGenerator não encontrado ou não pôde ser instanciado!");
+                ////Debug.LogError("MazeGenerator não encontrado ou não pôde ser instanciado!");
             }
             
             // --- Fim da Lógica de Geração do Labirinto Corrigida ---
@@ -142,7 +146,17 @@ public class GameManager : MonoBehaviour
             {
                 finalScoreText.text = "Final Score: " + GetFinalScoreForDisplay();
             }
+        }else if (scene.name == endSceneName)
+        {
+            // Find the score text in the WinScene and update it
+            TextMeshProUGUI finalScoreText = GameObject.Find("FinalScoreText")?.GetComponent<TextMeshProUGUI>();
+            if (finalScoreText != null)
+            {
+                finalScoreText.text = "Final Score: " + GetFinalScoreForDisplay();
+            }
         }
+
+        
     }
 
     public void StartLevel()
@@ -198,13 +212,14 @@ public class GameManager : MonoBehaviour
     public void CollectCoin()
     {
         collected++;
+        AudioSource.PlayClipAtPoint(collecFragtSound, Camera.main.transform.position, 1f);
         score += pointsPerCoin;
         timer += pointsPerCoin;
         UpdateUI();
 
         if (collected >= requiredToWin)
         {
-            if (level > 15)
+            if (level >= 15)
             {
                 Win_the_game();
             }else
@@ -217,6 +232,7 @@ public class GameManager : MonoBehaviour
     public void SubtractTime(int amount)
     {
         timer -= amount;
+        AudioSource.PlayClipAtPoint(obstacleSound, Camera.main.transform.position, 1f);
         if (timer <= 0)
         {
             GameOver();
@@ -260,7 +276,7 @@ public class GameManager : MonoBehaviour
             timerText.text = "Time: " + Mathf.Max(0, Mathf.CeilToInt(timer)).ToString();
 
         if (coinsText != null)
-            coinsText.text = "Coins: " + collected + " / " + requiredToWin;
+            coinsText.text = "Pieces: " + collected + " / " + requiredToWin;
             
         if (playerName != null)
         playerName.text = PlayerPrefs.GetString("PlayerName", "Default");
@@ -276,7 +292,7 @@ public class GameManager : MonoBehaviour
         HighScoreData highScoreData = HighScoreData.Load();
         highScoreData.AddScore(playerName, score, level);*/
 
-        Debug.Log("You win! Final Score: " + score);
+        ////Debug.Log("You win! Final Score: " + score);
 
         // Carrega a cena de vitória
         SceneManager.LoadScene(winSceneName);
@@ -292,7 +308,7 @@ void Win_the_game()
         HighScoreData highScoreData = HighScoreData.Load();
         highScoreData.AddScore(playerName, score, level);*/
 
-        Debug.Log("Congratulations! Final Score: " + score);
+        ////Debug.Log("Congratulations! Final Score: " + score);
 
         // Carrega a cena de vitória
         SceneManager.LoadScene(endSceneName);
@@ -312,11 +328,11 @@ void Win_the_game()
         if (GetCurrentMazeSize() < maxMazeSize)
         {
             level++;
-            Debug.Log("level updated to " + level);
+            //Debug.Log("level updated to " + level);
         }
         else
         {
-            Debug.Log("Max maze size reached; level remains " + level);
+            //Debug.Log("Max maze size reached; level remains " + level);
         }
         // load game scene (OnSceneLoaded will call StartLevel)
         SceneManager.LoadScene(gameSceneName);
@@ -358,11 +374,11 @@ void Win_the_game()
         }
         else
         {
-            Debug.LogWarning("nameInput não foi encontrado! Usando nome padrão.");
+            //Debug.LogWarning("nameInput não foi encontrado! Usando nome padrão.");
             PlayerPrefs.SetString("PlayerName", "Player");
         }
-        SceneManager.LoadScene(gameSceneName);
-        Debug.Log("Starting new game from menu, level set to 1.");
+        SceneManager.LoadScene(gameSceneName);//endSceneName gameSceneName
+        //Debug.Log("Starting new game from menu, level set to 1.");
     }
 
     // helper used by Win screen to show final score
@@ -382,7 +398,7 @@ void Win_the_game()
 
     void GameOver()
     {
-        Debug.Log("Game Over!");
+        //Debug.Log("Game Over!");
         // Salva a pontuação
         string playerName = PlayerPrefs.GetString("PlayerName", "Player");
         HighScoreData highScoreData = HighScoreData.Load();
